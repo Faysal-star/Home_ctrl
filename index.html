@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Home</title>
+    <link rel="shortcut icon" href="./home.png" type="image/x-icon">
+    <!-- <script type="module" src="app.js"></script> -->
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    
+    <div class="btns">
+    <h1>Smart Home Hub</h1>
+      <button class="b" id="btn">LED</button>
+      <button class="b" id="btn2">LED 2</button>
+      <button class="b" id="btn3">LED 3</button>
+      <div class="in">
+        <button class="b" id="inb1">Lock</button>
+        <input id="inp" placeholder="Enter Your Key">
+        <button class="b" id="inb2">Unlock</button>
+      </div>
+    </div>
+
+    <script type="module">
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js";
+      import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-analytics.js";
+      import {
+        getDatabase,
+        ref,
+        set,
+        child,
+        update,
+        remove,
+        get,
+      } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-database.js";
+      // https://firebase.google.com/docs/web/setup#available-libraries
+
+      const firebaseConfig = {
+        apiKey: "",
+        authDomain: "",
+        databaseURL: "",
+        projectId: "",
+        storageBucket: "",
+        messagingSenderId: "",
+        appId: "",
+        measurementId: "",
+      };
+
+      const app = initializeApp(firebaseConfig);
+      const db = getDatabase(app);
+      const dbRef = ref(db);
+
+      function geti() {
+        get(child(dbRef, `led`)).then((snapshot) => {
+          if (snapshot.exists()) {
+            let stat = snapshot.val();
+            stat ? seti(0) : seti(1);
+          }
+        });
+      }
+      function geti2() {
+        get(child(dbRef, `led2`)).then((snapshot) => {
+          if (snapshot.exists()) {
+            let stat = snapshot.val();
+            stat ? seti2(0) : seti2(1);
+          }
+        });
+      }
+      function geti3() {
+        get(child(dbRef, `led3`)).then((snapshot) => {
+          if (snapshot.exists()) {
+            let stat = snapshot.val();
+            stat ? seti3(0) : seti3(1);
+          }
+        });
+      }
+
+      function seti(pss) {
+        let ss = pss ? "ON" : "OFF";
+        document.getElementById("btn").innerText = "LED 1: " + ss;
+        update(ref(db, "/"), {
+          led: pss,
+        }).catch((error) => {
+          console.log("damm");
+        });
+      }
+      function seti2(pss) {
+        let ss = pss ? "ON" : "OFF";
+        document.getElementById("btn2").innerText = "LED 2: " + ss;
+        update(ref(db, "/"), {
+          led2: pss,
+        }).catch((error) => {
+          console.log("damm");
+        });
+      }
+      function seti3(pss) {
+        let ss = pss ? "ON" : "OFF";
+        document.getElementById("btn3").innerText = "LED 3: " + ss;
+        update(ref(db, "/"), {
+          led3: pss,
+        }).catch((error) => {
+          console.log("damm");
+        });
+      }
+      // geti();
+      seti(0);
+      seti2(0);
+      seti3(0);
+      // pass(0);
+      document.getElementById("btn").addEventListener("click", function () {
+        // sleep(1000)
+        geti();
+      });
+      document.getElementById("btn2").addEventListener("click", function () {
+        // sleep(1000)
+        geti2();
+      });
+      document.getElementById("btn3").addEventListener("click", function () {
+        // sleep(1000)
+        geti3();
+      });
+
+      document.getElementById("inb1").addEventListener("click" ,function(){verify(1)});
+      document.getElementById("inb2").addEventListener("click" ,function(){verify(2)});
+
+
+      function verify(crr){
+        let pass = "1234a"
+        let pass2 = document.getElementById("inp").value ;
+        // console.log(pass2)
+        if(pass == pass2){
+          if(crr == 1){
+            console.log("Lock");
+            update(ref(db, "/"), {
+              lock: 0,
+            }).catch((error) => {
+              console.log("damm");
+            });
+
+          }
+          else{
+            console.log("Unlock");
+            update(ref(db, "/"), {
+              lock: 1,
+            }).catch((error) => {
+              console.log("damm");
+            });
+            
+          } 
+
+        }
+        else{
+          alert("Eneter valid pass")
+        }
+      }
+
+      function sleep(ms) {
+        const date = Date.now();
+        let currentDate = null;
+        do {
+          currentDate = Date.now();
+        } while (currentDate - date < ms);
+      }
+    </script>
+  </body>
+</html>
